@@ -13,3 +13,26 @@ sum(cli_dev$dev=="dev-")
 #2775
 
 cli_dev<-cli_dev%>%mutate(new = case_when (CA_2016==0 |CA_2017>0 ~ "new", TRUE~ "old "))
+
+
+
+
+=== Analyse Uni et Bi variée
+
+
+library(questionr)
+plot(e$prix_ticket_moy_2016, e$age_an)
+
+str(e)
+
+#suppression de id
+e.bis <- e[,-1]
+
+#☺Analyse univariée
+summary(e.bis)
+
+hist(e.bis$age_an, col = "red", border = "white",
+     main = paste("Ages des", nrow(e.bis), "clients"),
+     xlab = "âge[années]", ylab = "Effectifs",
+     xlim = c(20,90),
+     labels = TRUE)
