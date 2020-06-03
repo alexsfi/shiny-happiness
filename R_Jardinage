@@ -29,6 +29,12 @@ cli_old<-cli_dev%>%filter(cli_dev$new=="old")%>%select(IDCLIENT, CA_2017, CA_201
 
 
 
+#Créons une variable pour identifier les clients fideles à 1 seul magasin ( flag = 1 )
+
+cli_old<-cli_old%>%mutate(fidele1mag = case_when(nb_diff_MAG_2016==1~"1", TRUE~"0"))
+
+# fideleà1mag    plusieurs_mag 
+# 25540          4453 
 
 
 
