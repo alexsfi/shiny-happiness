@@ -1,18 +1,33 @@
 
+
 #Créons une variable pour identifier les clients ayant plus acheté en 2017 qu'en 2016
  
-cli_dev<-jardinerie%>%select(jardinerie$IDCLIENT,jardinerie$CA_2017, jardinerie$CA_2016)
+cli_dev<-jardinerie2%>%select(jardinerie2$IDCLIENT,jardinerie2$CA_2017, jardinerie2$CA_2016)
 
-cli_dev<-jardinerie%>%mutate(dev= case_when( CA_2017>CA_2016 ~ "dev+", TRUE ~ "dev-"))
+cli_dev<-jardinerie2%>%mutate(dev= case_when( CA_2017>CA_2016 ~ "dev+", TRUE ~ "dev-"))
 
 #Comptons le potentiel de clients 
 sum(cli_dev$dev=="dev+")
-#27 225
+#10 541
 #Comptons le nombre de client à développer
 sum(cli_dev$dev=="dev-")
-#2775
+#19 549
 
-cli_dev<-cli_dev%>%mutate(new = case_when (CA_2016==0 |CA_2017>0 ~ "new", TRUE~ "old "))
+cli_dev<-cli_dev%>%mutate(new = case_when (CA_2016==0 & CA_2017>0 ~ "new", TRUE~ "old"))
+#new   old 
+#7    29993
+
+#Intéressons nous aux clients déjà familiers de l'enseigne en 2016
+
+cli_old<-cli_dev%>%filter(cli_dev$new=="old")%>%select(IDCLIENT, CA_2017, CA_2016, new, dev, VIP)
+
+# Y a t il parmis les anciens clients, des clients achetant plus en 2017 ?
+#dev-   dev+ 
+# 19459 10534 
+
+#Il serait intéressant de connaitre le profil de ces 10 534 clients qui ont acheté plus en 2017 pour cibler nos actions marketings
+
+
 
 
 
