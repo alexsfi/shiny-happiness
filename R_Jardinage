@@ -36,6 +36,25 @@ cli_old<-cli_old%>%mutate(fidele1mag = case_when(nb_diff_MAG_2016==1~"1", TRUE~"
 # fideleà1mag    plusieurs_mag 
 # 25540          4453 
 
+# Afin de normaliser nos données, nous crééons des variable pour identifier le profil d'achat des clients : achat unique, shoppeur, à partir de la variable nb_univers_different_2016
+
+profil_achat<- cli_dev%>%group_by(cli_dev$nb_univers_different_2016)%>%summarize(n(), mean(CA_2016))
+
+# cli_dev.nb_univers_different_2016  n.. mean.CA_2016.
+#1                                 1 5401      202.5451
+#2                                 2 6888      273.3901
+#3                                 3 6125      385.1072
+#4                                 4 4423      561.8280
+#5                                 5 1912      781.2183
+#6                                 6  211     1362.7709
+#7                                NA 5040      136.7193
+
+
+#On remarque sans surprise que les clients achetant dans plusieurs univers dépensent plus. Nous avons 3 catégories: achat unique ( 1 à 3 univers), flaneur ( 4, 5 univers) et shopper (6univers)
+
+cli_dev<-cli_dev%>%mutate(achat_unique = case_when(nb_univers_different_2016==1 |(nb_univers_different_2016==2) | (nb_univers_different_2016==3) ~ "1", TRUE ~ "0"))
+cli_dev<-cli_dev%>%mutate(flaneur = case_when(nb_univers_different_2016==4 |(nb_univers_different_2016==5) ~ "1", TRUE ~ "0"))
+cli_dev<-cli_dev%>%mutate(shopper = case_when(nb_univers_different_2016==6 ~ "1", TRUE ~ "0"))
 
 
 === Analyse Uni et Bi variée
