@@ -56,6 +56,17 @@ cli_dev<-cli_dev%>%mutate(achat_unique = case_when(nb_univers_different_2016==1 
 cli_dev<-cli_dev%>%mutate(flaneur = case_when(nb_univers_different_2016==4 |(nb_univers_different_2016==5) ~ "1", TRUE ~ "0"))
 cli_dev<-cli_dev%>%mutate(shopper = case_when(nb_univers_different_2016==6 ~ "1", TRUE ~ "0"))
 
+#Créons des variables pour discrétiser le CA de 2016 et 2017 afin de pouvoir plus facilement l'analyser
+#Afin de créer des intervalles nous faisons une boite à moustache 
+
+boxplot(cli_dev$CA_2016) 
+
+#Intervalle 0-100, 100-200, 200-400, et + de 400
+cli_dev<-cli_dev%>%mutate(CA_2016_inf100=case_when(cli_dev$CA_2016<"100" ~ "1", TRUE~"0"))
+cli_dev<-cli_dev%>%mutate(CA_2016_100200=case_when(cli_dev$CA_2016>"100" & cli_dev$CA_2016<"200" ~ "1", TRUE~"0"))
+cli_dev<-cli_dev%>%mutate(CA_2016_200400=case_when(cli_dev$CA_2016>"200"& cli_dev$CA_2016<"400" ~ "1", TRUE~"0"))
+
+cli_dev<-cli_dev%>%mutate(CA_2016_sup400=case_when(cli_dev$CA_2016>"400" ~ "1", TRUE~"0"))
 
 === Analyse Uni et Bi variée
 
