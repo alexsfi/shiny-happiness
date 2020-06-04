@@ -59,20 +59,48 @@ cli_dev<-cli_dev%>%mutate(shopper = case_when(nb_univers_different_2016==6 ~ "1"
 
 === Analyse Uni et Bi variée
 
+setwd("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/")
+
+install.packages(c("readr", "dplyr"))
+library(dplyr)
+library(readr)
+
+e <- read.csv2("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/base.csv", encoding="UTF-8", sep=";")
 
 library(questionr)
 plot(e$prix_ticket_moy_2016, e$age_an)
 
 str(e)
 
-#suppression de id
-e.bis <- e[,-1]
 
-#☺Analyse univariée
-summary(e.bis)
+#âºAnalyse univariÃ©e
+summary(e)
 
-hist(e.bis$age_an, col = "red", border = "white",
-     main = paste("Ages des", nrow(e.bis), "clients"),
-     xlab = "âge[années]", ylab = "Effectifs",
+
+#Age/CA
+
+
+hist(e$age_an, col = "red", border = "white",
+     main = paste("Ages des", nrow(e), "clients"),
+     xlab = "Age[annees]", ylab = "Effectifs",
      xlim = c(20,90),
      labels = TRUE)
+
+# Analyse des variables Age, %montant univers
+
+# ===== Analyse bivariée =====
+#Age/CA
+plot(e$CA_2016, e$age_an)
+plot(e$CA_2016, e$age_an, pch = 20, col = rgb(1,0,0,0.1))
+
+
+# Heure moy d'achat/ CA'
+plot(e$CA_2016, e$h_mean_2016)
+plot(e$CA_2016, e$h_mean_2016, pch = 20, col = rgb(1,0,0,0.1))
+
+# CA/ nbre de ticket
+plot(e$CA_2016, e$nbtic_2016)
+plot(e$CA_2016, e$nbtic2016, pch = 20, col = rgb(1,0,0,0.1))
+
+# Quelle heure est-ce le plus rempli ?
+
