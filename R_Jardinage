@@ -113,5 +113,56 @@ plot(e$CA_2016, e$h_mean_2016, pch = 20, col = rgb(1,0,0,0.1))
 plot(e$CA_2016, e$nbtic_2016)
 plot(e$CA_2016, e$nbtic2016, pch = 20, col = rgb(1,0,0,0.1))
 
-# Quelle heure est-ce le plus rempli ?
+
+
+# ==== Regression
+
+
+barplot(prop.table(table(e$VIP)))
+table(e$VIP)
+prop.table(table(e$VIP))
+
+
+# Regression logistique recherche
+# creation de la formule
+formule <- y ~ nbtic_2016 + flaneur + new + MAGASIN + VIP + CA_2016_inf100 + CA_2016_100200 + CA_2016_200400 + 
+ CA_2016_sup400 + DATEDEBADH_mois + prix_ticket_moy_2016 + shopper + achat_unique + age_QL + dev + h_mean_2016 
+
+# creation de la table à analyser
+liste_var = c("nbtic_2016", "flaneur", "new", "MAGASIN", "VIP", "CA_2016_inf100", "CA_2016_100200", "CA_2016_200400", "CA_2016_sup400", "DATEDEBADH_mois", "prix_ticket_moy_2016", "shopper", "achat_unique", "age_QL", "dev", "h_mean_2016")
+
+table_a = e[,liste_var]
+
+
+logit <- glm(VIP~1,data=table_a,family=binomial(link = "logit"))
+summary(logit)
+
+# echantillon d'apprentissage et validation (1000)
+
+cles <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/cles2.csv", quote="", header=TRUE, encoding="UTF-8", sep=";")
+
+train <- table_a[cles$test,]
+valid <- table_a[-cles$test,]
+
+# recherche maximale ascendante
+selection <- step(logit,direction="forward",trace=TRUE,k = log(nrow(train)),
+                  scope=list(upper=formule))
+
+selection
+summary(selection)
+
+# recherche moins restrictive
+selection <- step(logit,direction="forward",trace=TRUE,k=2, scope=list(upper=formule))
+
+summary(selection)
+
+train$ascaic <- predict(selection, newdata=train, type="response")
+valid$ascaic <- predict(selection, newdata=valid, type="response")
+
+pred <- prediction(train$ascaic,train$Cible,label.ordering=c(0,1))
+performance(pred,"auc")@y.values[[1]]
+pred <- prediction(valid$ascaic,valid$Cible,label.ordering=c(0,1))
+performance(pred,"auc")@y.values[[1]]
+
+# => meilleur modele
 
