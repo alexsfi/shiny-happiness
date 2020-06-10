@@ -11,6 +11,8 @@ library(lattice)
 library('caret')
 library("lubridate")
 
+j <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/Base.csv", header=TRUE, stringsAsFactors=FALSE, quote="", encoding="UTF-8", sep=";")
+
 
 j<-Base
 
@@ -60,11 +62,8 @@ j<-j%>%mutate(new = case_when (CA_2016==0 & CA_2017>0 ~ "new", TRUE~ "old"))
 
 cli_old<-j%>%filter(j$new=="old")%>%select(MAGASIN,IDCLIENT, CA_2017, CA_2016, new, dev, VIP, CIVILITE,xx, age_disc10, nb_diff_MAG_2016)
 
-# Y a t il parmis les anciens clients, des clients achetant plus en 2017 ?
-#dev-   dev+ 
-# 19459 10534 
 
-#Il serait intéressant de connaitre le profil de ces 10 534 clients qui ont acheté plus en 2017 pour cibler nos actions marketings
+#Il serait intéressant de connaitre le profil de ces 8 413 clients qui ont acheté plus en 2017 pour cibler vos actions marketings
 
 #Créons une variable pour identifier les clients fideles à 1 seul magasin ( flag = 1 )
 
@@ -206,7 +205,9 @@ j2$dev=as.vector(j2$dev)
 
 
 
-# Analyse des variables Age, %montant univers
+# #Analyse des variables Age, %montant univers ##
+e <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/Base.csv", header=TRUE, stringsAsFactors=FALSE, quote="", encoding="UTF-8", sep=";")
+# TRAVAIL LA MEME BASE MAIS NOMMEE e
 
 # ===== Analyse bivariée =====
 #Age/CA
@@ -248,26 +249,11 @@ plot(e$CA_2017, e$nbtic_2017, ylab = "Nombre de tickets", xlab = "CA 2017")
 abline(reg, col = "red")
 
 
-
-e <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/Base.csv", header=TRUE, stringsAsFactors=FALSE, quote="", encoding="UTF-8", sep=";")
-
-
 #CrÃ©ons une variable pour identifier les clients ayant plus achetÃ© en 2017 qu'en 2016
 library(dplyr)
 library(tidyverse)
 str(e)
 
-
-# Ajouts de variables
-
-e<-e%>%mutate(achat_unique = case_when(nb_univers_different_2016==1 |(nb_univers_different_2016==2) | (nb_univers_different_2016==3) ~ "1", TRUE ~ "0"))
-e<-e%>%mutate(flaneur = case_when(nb_univers_different_2016==4 |(nb_univers_different_2016==5) ~ "1", TRUE ~ "0"))
-e<-e%>%mutate(shopper = case_when(nb_univers_different_2016==6 ~ "1", TRUE ~ "0"))
-e<-e%>%mutate(new = case_when (CA_2016==0 & CA_2017>0 ~ "new", TRUE~ "old"))
-e<-e%>%mutate(dev= case_when (CA_2017>CA_2016 ~ "1", TRUE ~ "0"))
-e<-e%>%mutate(CA_2016_inf100= case_when(CA_2016>100 ~ "1", TRUE ~ "0"))
-e<-e%>%mutate(CA_2016_100200= case_when(CA_2016>"100" & CA_2016<"200" ~ "1", TRUE~"0"))
-e<-e%>%mutate(CA_2016_200400= case_when(CA_2016>"200" & CA_2016<"400" ~ "1", TRUE~"0"))
 
 #Creation de J2 pour selectionner nos variables à
 
@@ -296,6 +282,7 @@ liste_var = c("flaneur", "nbtic_2016", "nb_mois_diff_2016", "VIP", "DATEDEBADH_m
 
 
 table_a = e[,liste_var]
+
 # Logique d'AIC
 str(train)
 
