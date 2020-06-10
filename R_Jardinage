@@ -33,26 +33,30 @@ j$xx=as.numeric(j$xx)
 
 j<-j%>%mutate(dev= case_when( CA_2017>CA_2016 ~ "1", TRUE ~ "0"))
 
-#CA 2016
+#CA 2016#
 sum(j$CA_2016)
+
 #10 291 103 
-#CA 2017
+
+#CA 2017#
 sum(j$CA_2017)
+
 #7 454 217
 
 
-#Comptons le potentiel de clients 
+#Comptons le client ayant acheté en 2017 plus qu'en 2016
 sum(j$dev=="1")
 #8 413
-#Comptons le nombre de client à développer
-sum(j$dev=="0")
-#21587
 
+#Comptons le nombre de client qui ont moins acheté en 2016
+sum(j$dev=="0")
+#21 587
+
+#Intéressons nous aux clients déjà familiers de l'enseigne en 2016
 j<-j%>%mutate(new = case_when (CA_2016==0 & CA_2017>0 ~ "new", TRUE~ "old"))
 #new   old 
 #7    29993
 
-#Intéressons nous aux clients déjà familiers de l'enseigne en 2016
 
 cli_old<-j%>%filter(j$new=="old")%>%select(MAGASIN,IDCLIENT, CA_2017, CA_2016, new, dev, VIP, CIVILITE,xx, age_disc10, nb_diff_MAG_2016)
 
