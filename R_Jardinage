@@ -68,24 +68,11 @@ cli_dev<-cli_dev%>%mutate(CA_2016_200400=case_when(cli_dev$CA_2016>"200"& cli_de
 
 cli_dev<-cli_dev%>%mutate(CA_2016_sup400=case_when(cli_dev$CA_2016>"400" ~ "1", TRUE~"0"))
 
-=== Analyse Uni et Bi variée
+## =========================== ######
 
-setwd("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/")
+e <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/Base.csv", header=TRUE, stringsAsFactors=FALSE, quote="", encoding="UTF-8", sep=";")
 
-install.packages(c("readr", "dplyr"))
-library(dplyr)
-library(readr)
-
-e <- read.csv2("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/base.csv", encoding="UTF-8", sep=";")
-
-library(questionr)
-plot(e$prix_ticket_moy_2016, e$age_an)
-
-#âºAnalyse univariÃ©e
-summary(e)
-
-
-#Age/CA
+# Analyse bivariée
 
 
 hist(e$age_an, col = "red", border = "white",
@@ -93,23 +80,6 @@ hist(e$age_an, col = "red", border = "white",
      xlab = "Age[annees]", ylab = "Effectifs",
      xlim = c(20,90),
      labels = TRUE)
-
-# Analyse des variables Age, %montant univers
-
-# ===== Analyse bivariée =====
-#Age/CA
-plot(e$CA_2016, e$age_an)
-plot(e$CA_2016, e$age_an, pch = 20, col = rgb(1,0,0,0.1))
-
-
-# Heure moy d'achat/ CA'
-plot(e$CA_2016, e$h_mean_2016)
-plot(e$CA_2016, e$h_mean_2016, pch = 20, col = rgb(1,0,0,0.1))
-
-# CA/ nbre de ticket
-plot(e$CA_2016, e$nbtic_2016)
-plot(e$CA_2016, e$nbtic2016, pch = 20, col = rgb(1,0,0,0.1))
-
 
 #nbre de ticket vs CA en 2016
 plot(e$nbtic_2016, e$CA_2016)
@@ -136,14 +106,12 @@ plot(e$CA_2017, e$nbtic_2017, ylab = "Nombre de tickets", xlab = "CA 2017")
 abline(reg, col = "red")
 
 
-
-e <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/Base.csv", header=TRUE, stringsAsFactors=FALSE, quote="", encoding="UTF-8", sep=";")
-
-
 #CrÃ©ons une variable pour identifier les clients ayant plus achetÃ© en 2017 qu'en 2016
 library(dplyr)
 library(tidyverse)
-str(e)
+install.packages("ROCR")
+library(ROCR)
+
 
 
 # Ajouts de variables
@@ -157,7 +125,7 @@ e<-e%>%mutate(CA_2016_inf100= case_when(CA_2016>100 ~ "1", TRUE ~ "0"))
 e<-e%>%mutate(CA_2016_100200= case_when(CA_2016>"100" & CA_2016<"200" ~ "1", TRUE~"0"))
 e<-e%>%mutate(CA_2016_200400= case_when(CA_2016>"200" & CA_2016<"400" ~ "1", TRUE~"0"))
 
-#Creation de J2 pour selectionner nos variables à
+#Creation de J2 pour selectionner nos variables pertinentes
 
 j2<-e%>%select(nbtic_2016, flaneur, new, nb_mois_diff_2016, MAGASIN, VIP, DATEDEBADH_mois, prix_ticket_moy_2016, shopper, achat_unique, age_QL, dev, h_mean_2016_QL)
 j2$dev=as.vector(j2$dev)
@@ -167,7 +135,7 @@ liste_variable = c("nbtic_2016", "flaneur", "new", "MAGASIN", "VIP", "CA_2016_in
 # Regression logistique recherche
 
 
-## convertir char en factor
+## convertir les valeurs
 e$flaneur <- as.factor((e$flaneur))
 e$dev <- as.factor((e$dev))
 e$h_mean_2016_QL <- as.factor((e$h_mean_2016_QL))
@@ -220,5 +188,7 @@ performance(pred,"auc")@y.values[[1]]
 
 # => meilleur modele
 summary(selection)
+
+
 
 
