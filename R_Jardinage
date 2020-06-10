@@ -81,9 +81,6 @@ e <- read.csv2("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/base.csv"
 library(questionr)
 plot(e$prix_ticket_moy_2016, e$age_an)
 
-str(e)
-
-
 #âºAnalyse univariÃ©e
 summary(e)
 
@@ -112,6 +109,31 @@ plot(e$CA_2016, e$h_mean_2016, pch = 20, col = rgb(1,0,0,0.1))
 # CA/ nbre de ticket
 plot(e$CA_2016, e$nbtic_2016)
 plot(e$CA_2016, e$nbtic2016, pch = 20, col = rgb(1,0,0,0.1))
+
+
+#nbre de ticket vs CA en 2016
+plot(e$nbtic_2016, e$CA_2016)
+plot(e$nbtic_2016, e$CA_2016, pch = 20, col = rgb(1,0,0,0.1))
+cor(e$nbtic_2016, e$CA_2016)
+
+reg <- lm(nbtic_2016 ~ CA_2016, data =e)
+summary(reg)
+
+plot(e$CA_2016, e$nbtic_2016, ylab = "Nombre de tickets", xlab = "CA 2016")
+abline(reg, col = "red")
+
+#nbre de ticket vs CA en 2017
+
+
+plot(e$nbtic_2017, e$CA_2017)
+plot(e$nbtic_2017, e$CA_2017, pch = 20, col = rgb(1,0,0,0.1))
+cor(e$nbtic_2017, e$CA_2017)
+
+reg <- lm(nbtic_2016 ~ CA_2016, data =e)
+summary(reg)
+
+plot(e$CA_2017, e$nbtic_2017, ylab = "Nombre de tickets", xlab = "CA 2017")
+abline(reg, col = "red")
 
 
 
