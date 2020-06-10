@@ -117,59 +117,136 @@ plot(e$CA_2016, e$nbtic2016, pch = 20, col = rgb(1,0,0,0.1))
 
 # ==== Regression
 
-
-barplot(prop.table(table(e$VIP)))
-table(e$VIP)
-prop.table(table(e$VIP))
-
-
-# Regression logistique binaire
-# Conversion de dev en boléen
-j2$dev <- FALSE
-j2$dev[j2$dev =="1"] <- TRUE 
-
-e_reg <- glm(dev ~ h_mean_2016_QL + prix_ticket_moy_2016 + nbtic_2016, data=j2, family = binomial(logit))
+# Vidage de memoire en preambule
+rm(list = ls())
+gc()
 
 
-j2$flaneur <- FALSE
-j2$flaneur[j2$flaneur =="1"] <- TRUE 
-e_reg2 <- glm(flaneur ~ h_mean_2016_QL + prix_ticket_moy_2016 + nbtic_2016, data=j2, family = binomial(logit))
-e_reg2
+e <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/Base.csv", header=TRUE, stringsAsFactors=FALSE, quote="", encoding="UTF-8", sep=";")
 
-j2$VIP <- FALSE
-j2$VIP[j2$VIP =="1"] <- TRUE 
 
-e_reg3 <- glm(VIP ~ h_mean_2016_QL + prix_ticket_moy_2016 + nbtic_2016, data=j2, family = binomial(logit))
-e_reg3
+#CrÃ©ons une variable pour identifier les clients ayant plus achetÃ© en 2017 qu'en 2016
+library(dplyr)
+library(tidyverse)
 
-summary(e_reg3)
+cli_dev<-e%>%select(e$IDCLIENT,e$CA_2017, e$CA_2016)
+str(e)
+cli_dev<-e%>%mutate(dev= case_when( CA_2017>CA_2016 ~ "dev+", TRUE ~ "dev-"))
+
+#Comptons le potentiel de clients 
+sum(cli_dev$dev=="dev+")
+#10 541
+#Comptons le nombre de client Ã  dÃ©velopper
+sum(cli_dev$dev=="dev-")
+#19 549
+
+cli_dev<-cli_dev%>%mutate(new = case_when (CA_2016==0 & CA_2017>0 ~ "new", TRUE~ "old"))
+#new   old 
+#7    29993
+
+#IntÃ©ressons nous aux clients dÃ©jÃ  familiers de l'enseigne en 2016
+
+cli_old<-cli_dev%>%filter(cli_dev$new=="old")%>%select(IDCLIENT, CA_2017, CA_2016, new, dev, VIP)
+
+# Y a t il parmis les anciens clients, des clients achetant plus en 2017 ?
+#dev-   dev+ 
+# 19459 10534 
+
+#Il serait intÃ©ressant de connaitre le profil de ces 10 534 clients qui ont achetÃ© plus en 2017 pour cibler nos actions marketings
+
+
+
+#CrÃ©ons une variable pour identifier les clients fideles Ã  1 seul magasin ( flag = 1 )
+
+cli_old<-cli_old%>%mutate(fidele1mag = case_when(nb_diff_MAG_2016==1~"1", TRUE~"0"))
+
+# fideleÃ 1mag    plusieurs_mag 
+# 25540          4453 
+
+# Afin de normaliser nos donnÃ©es, nous crÃ©Ã©ons des variable pour identifier le profil d'achat des clients : achat unique, shoppeur, Ã  partir de la variable nb_univers_different_2016
+
+profil_achat<- cli_dev%>%group_by(cli_dev$nb_univers_different_2016)%>%summarize(n(), mean(CA_2016))
+
+# Table analyse J2 + Autres variables
+
+e<-e%>%mutate(achat_unique = case_when(nb_univers_different_2016==1 |(nb_univers_different_2016==2) | (nb_univers_different_2016==3) ~ "1", TRUE ~ "0"))
+e<-e%>%mutate(flaneur = case_when(nb_univers_different_2016==4 |(nb_univers_different_2016==5) ~ "1", TRUE ~ "0"))
+e<-e%>%mutate(shopper = case_when(nb_univers_different_2016==6 ~ "1", TRUE ~ "0"))
+e<-e%>%mutate(new = case_when (CA_2016==0 & CA_2017>0 ~ "new", TRUE~ "old"))
+e<-e%>%mutate(dev= case_when (CA_2017>CA_2016 ~ "1", TRUE ~ "0"))
+e<-e%>%mutate(CA_2016_inf100= case_when(CA_2016>100 ~ "1", TRUE ~ "0"))
+e<-e%>%mutate(CA_2016_100200= case_when(CA_2016>"100" & CA_2016<"200" ~ "1", TRUE~"0"))
+e<-e%>%mutate(CA_2016_200400= case_when(CA_2016>"200" & CA_2016<"400" ~ "1", TRUE~"0"))
+
+# a delete ?
+e$DATEFINADH=as.Date(e$DATEFINADH)
+e$DATEDEBUTADHESION=as.Date(e$DATEDEBUTADHESION)
+e<-e%>%mutate(dureeadh_mois= round(as.numeric(difftime(e$DATEFINADH, e$DATEDEBADH, units = "days"))/(365.25/12)))
+e<-e%>%mutate(duree_re_adh_mois= round(as.numeric(difftime(e$DATEFINADH, e$DATEREADH, units = "days"))/(365.25/12)))
+e$duree_re_adh_mois=(j2$duree_re_adh_mois)
+e$dureeadh_mois=(j2$dureeadh_mois)
+
+j2<-e%>%select(nbtic_2016, flaneur, new, nb_mois_diff_2016, MAGASIN, VIP, DATEDEBADH_mois, prix_ticket_moy_2016, shopper, achat_unique, age_QL, dev, h_mean_2016_QL)
+j2$dev=as.vector(j2$dev)
+liste_variable = c("nbtic_2016", "flaneur", "new", "MAGASIN", "VIP", "CA_2016_inf100", "CA_2016_100200", "CA_2016_200400", "CA_2016_sup400", "DATEDEBADH_mois", "prix_ticket_moy_2016", "shopper", "achat_unique", "age_QL", "dev", "h_mean_2016_QL")
+
+
+# cli_dev.nb_univers_different_2016  n.. mean.CA_2016.
+#1                                 1 5401      202.5451
+#2                                 2 6888      273.3901
+#3                                 3 6125      385.1072
+#4                                 4 4423      561.8280
+#5                                 5 1912      781.2183
+#6                                 6  211     1362.7709
+#7                                NA 5040      136.7193
+
+
+#On remarque sans surprise que les clients achetant dans plusieurs univers dÃ©pensent plus. Nous avons 3 catÃ©gories: achat unique ( 1 Ã  3 univers), flaneur ( 4, 5 univers) et shopper (6univers)
+
+cli_dev<-cli_dev%>%mutate(achat_unique = case_when(nb_univers_different_2016==1 |(nb_univers_different_2016==2) | (nb_univers_different_2016==3) ~ "1", TRUE ~ "0"))
+cli_dev<-cli_dev%>%mutate(flaneur = case_when(nb_univers_different_2016==4 |(nb_univers_different_2016==5) ~ "1", TRUE ~ "0"))
+cli_dev<-cli_dev%>%mutate(shopper = case_when(nb_univers_different_2016==6 ~ "1", TRUE ~ "0"))
+
 
 
 # Regression logistique recherche
+
+
+## convertir char en factor
+e$flaneur <- as.factor((e$flaneur))
+e$dev <- as.factor((e$dev))
+e$h_mean_2016_QL <- as.factor((e$h_mean_2016_QL))
+e$MAGASIN <- as.factor((e$MAGASIN))
+e$achat_unique <- as.factor((e$achat_unique))
+e$shopper <- as.factor((e$shopper))
+e$age_QL <- as.factor((e$age_QL))
+e$prix_ticket_moy_2016 <- as.integer((e$prix_ticket_moy_2016))
+
 # creation de la formule
-formule <- y ~ nbtic_2016 + flaneur + new + nb_mois_diff_2016 + MAGASIN + VIP + DATEDEBADH_mois + prix_ticket_moy_2016 + shopper + achat_unique + age_QL + dev + h_mean_2016_QL
+formule <- y ~ flaneur + nbtic_2016 +   nb_mois_diff_2016 +  VIP + DATEDEBADH_mois + prix_ticket_moy_2016 + shopper + achat_unique + age_QL + dev + h_mean_2016_QL
 # creation de la table à analyser
-liste_var = c("nbtic_2016", "flaneur", "new", "nb_mois_diff_2016", "MAGASIN", "VIP", "DATEDEBADH_mois", "prix_ticket_moy_2016", "shopper", "achat_unique", "age_QL", "dev", "h_mean_2016_QL")
+liste_var = c("flaneur", "nbtic_2016", "nb_mois_diff_2016", "VIP", "DATEDEBADH_mois", "prix_ticket_moy_2016", "shopper", "achat_unique", "age_QL", "dev", "h_mean_2016_QL")
+
 
 table_a = e[,liste_var]
 # Logique d'AIC
-
-logit <- glm(VIP~1,data=j2,family=binomial(link = "logit"))
-summary(logit)
+str(train)
 
 # echantillon d'apprentissage et validation (350 lignes)
 
 cles <- read.csv("C:/Users/Alex/Desktop/MBA BIG DATA/Semestre 2/examen R/cles2.csv", quote="", header=TRUE, encoding="UTF-8", sep=";")
 
-train <- j2[cles$test,]
-valid <- j2[-cles$test,]
+train <- table_a[cles$test,]
+valid <- table_a[-cles$test,]
 
-# recherche maximale ascendante
-selection <- step(logit,direction="forward",trace=TRUE,k = log(nrow(train)),
-                  scope=list(upper=formule))
+# recherche du meilleur modÃ¨le avec la glm et step
+logit <- glm(dev~1,data=train,family=binomial(link = "logit"))
+summary(logit)
 
-selection
-summary(selection)
+
+
+selection <- step(logit,direction="forward",trace=TRUE,k = log(nrow(train)), scope=list(upper=formule))
+
 
 # recherche moins restrictive
 selection <- step(logit,direction="forward",trace=TRUE,k=2, scope=list(upper=formule))
@@ -179,9 +256,30 @@ summary(selection)
 train$ascaic <- predict(selection, newdata=train, type="response")
 valid$ascaic <- predict(selection, newdata=valid, type="response")
 
+#Calcul de l'AUC
+install.packages("ROCR")
+library(ROCR)
+pred <- prediction(train$ascaic,train$dev,label.ordering=c(0,1))
+performance(pred,"auc")@y.values[[1]]
+pred <- prediction(valid$ascaic,valid$dev,label.ordering=c(0,1))
+performance(pred,"auc")@y.values[[1]]
+
+# => meilleur modele
+summary(selection)
+
+## regression logistique Evaluation visuelle
+
+library(car)
+# nbre tciket.horaire
+scatterplot(nbtic_2016~h_mean_2016, data=j2)
+h_nbtic.lm1 <- lm(nbtic_2016~h_mean_2016, data=j2)
+acf(residuals(h_nbtic.lm1), main="h_nbti.lm1")
+plot(h_nbtic.lm1,2)
+
+#dev et prix moyen ticket
 
 
-pred <- prediction(train$ascaic,train$Cible,label.ordering=c(0,1))
-performance(pred,"auc")@y.values[[1]]
-pred <- prediction(valid$ascaic,valid$Cible,label.ordering=c(0,1))
-performance(pred,"auc")@y.values[[1]]
+scatterplot(dev~prix_ticket_moy_2016, data=j2)
+dev_prix_moy.lm1 <- lm(dev~prix_ticket_moy_2016, data=j2)
+acf(residuals(dev_prix_moy.lm1), main="dev_prix_moy.lm1")
+plot(dev_prix_moy.lm1,2)
