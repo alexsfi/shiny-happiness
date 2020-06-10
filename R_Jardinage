@@ -215,7 +215,7 @@ plot(e$CA_2016, e$age_an)
 plot(e$CA_2016, e$age_an, pch = 20, col = rgb(1,0,0,0.1))
 
 
-# Heure moy d'achat/ CA'
+# Heure moy d'achat/ CA
 plot(e$CA_2016, e$h_mean_2016)
 plot(e$CA_2016, e$h_mean_2016, pch = 20, col = rgb(1,0,0,0.1))
 
@@ -249,7 +249,7 @@ plot(e$CA_2017, e$nbtic_2017, ylab = "Nombre de tickets", xlab = "CA 2017")
 abline(reg, col = "red")
 
 
-#CrÃ©ons une variable pour identifier les clients ayant plus achetÃ© en 2017 qu'en 2016
+#Création de la variable pour identifier les clients ayant plus acheté en 2017 qu'en 2016
 library(dplyr)
 library(tidyverse)
 str(e)
@@ -314,12 +314,14 @@ valid$ascaic <- predict(selection, newdata=valid, type="response")
 
 pred <- prediction(train$ascaic,train$dev,label.ordering=c(0,1))
 performance(pred,"auc")@y.values[[1]]
+# => 0.7247854
 pred <- prediction(valid$ascaic,valid$dev,label.ordering=c(0,1))
 performance(pred,"auc")@y.values[[1]]
+# => 0.7397711
 
 # => meilleur modele
 summary(selection)
-
+# => AIC: 400.05
 
 #V de cramer
 liste_variable = c("nbtic_2016", "flaneur", "new", "nb_mois_diff_2016","nb_diff_MAG_2016_QL","prix_ticket_moy_2016_QL", "part_nb_univers_2016_U1_QL","MAGASIN", "VIP", "CA_2016_inf100", "CA_2016_100200", "CA_2016_200400", "CA_2016_sup400", "DATEDEBADH_mois", "prix_ticket_moy_2016", "shopper", "achat_unique", "age_QL", "dev", "h_mean_2016_QL")
