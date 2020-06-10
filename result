@@ -1,10 +1,140 @@
-Step:  AIC=18975.09
-VIP ~ nb_mois_diff_2016 + prix_ticket_moy_2016 + dev + flaneur + 
-    nbtic_2016 + achat_unique + shopper + DATEDEBADH_mois
+selection <- step(logit,direction="forward",trace=TRUE,k = log(nrow(train)), scope=list(upper=formule))
 
-                 Df Deviance   AIC
-<none>                 18922 18975
-+ h_mean_2016_QL  3    18907 18977
-+ new             1    18922 18980
-+ age_QL          4    18905 18981
-+ MAGASIN        66    18817 19256
+
+Start:  AIC=446.84
+dev ~ 1
+
+                       Df Deviance    AIC
++ flaneur               1   430.35 442.06
++ VIP                   1   434.26 445.97
+<none>                      440.98 446.84
++ prix_ticket_moy_2016  1   435.26 446.98
++ DATEDEBADH_mois       1   439.78 451.49
++ nbtic_2016            1   440.73 452.44
++ shopper               1   440.87 452.58
++ nb_mois_diff_2016     1   440.91 452.62
++ achat_unique          1   440.96 452.67
++ h_mean_2016_QL        3   440.78 464.20
++ age_QL                4   439.24 468.52
++ MAGASIN              52   378.09 688.41
+
+Step:  AIC=442.06
+dev ~ flaneur
+
+                       Df Deviance    AIC
++ achat_unique          1   416.33 433.89
+<none>                      430.35 442.06
++ prix_ticket_moy_2016  1   424.96 442.53
++ VIP                   1   427.40 444.97
++ nb_mois_diff_2016     1   427.71 445.27
++ nbtic_2016            1   429.71 447.27
++ DATEDEBADH_mois       1   429.91 447.47
++ shopper               1   430.33 447.89
++ h_mean_2016_QL        3   430.20 459.48
++ age_QL                4   428.69 463.82
++ MAGASIN              52   368.59 684.76
+
+Step:  AIC=433.89
+dev ~ flaneur + achat_unique
+
+                       Df Deviance    AIC
+<none>                      416.33 433.89
++ nb_mois_diff_2016     1   410.64 434.06
++ prix_ticket_moy_2016  1   412.52 435.94
++ VIP                   1   413.83 437.25
++ nbtic_2016            1   414.88 438.30
++ shopper               1   415.16 438.58
++ DATEDEBADH_mois       1   415.99 439.41
++ h_mean_2016_QL        3   416.02 451.15
++ age_QL                4   414.27 455.25
++ MAGASIN              52   352.55 674.58
+
+
+
+selection <- step(logit,direction="forward",trace=TRUE,k=2, scope=list(upper=formule))
+Start:  AIC=442.98
+dev ~ 1
+
+                       Df Deviance    AIC
++ flaneur               1   430.35 434.35
++ VIP                   1   434.26 438.26
++ prix_ticket_moy_2016  1   435.26 439.26
+<none>                      440.98 442.98
++ DATEDEBADH_mois       1   439.78 443.78
++ nbtic_2016            1   440.73 444.73
++ shopper               1   440.87 444.87
++ nb_mois_diff_2016     1   440.91 444.91
++ achat_unique          1   440.96 444.96
++ h_mean_2016_QL        3   440.78 448.78
++ age_QL                4   439.24 449.24
++ MAGASIN              52   378.09 484.09
+
+Step:  AIC=434.35
+dev ~ flaneur
+
+                       Df Deviance    AIC
++ achat_unique          1   416.33 422.33
++ prix_ticket_moy_2016  1   424.96 430.96
++ VIP                   1   427.40 433.40
++ nb_mois_diff_2016     1   427.71 433.71
+<none>                      430.35 434.35
++ nbtic_2016            1   429.71 435.71
++ DATEDEBADH_mois       1   429.91 435.91
++ shopper               1   430.33 436.33
++ h_mean_2016_QL        3   430.20 440.20
++ age_QL                4   428.69 440.69
++ MAGASIN              52   368.59 476.59
+
+Step:  AIC=422.33
+dev ~ flaneur + achat_unique
+
+                       Df Deviance    AIC
++ nb_mois_diff_2016     1   410.64 418.64
++ prix_ticket_moy_2016  1   412.52 420.52
++ VIP                   1   413.83 421.83
+<none>                      416.33 422.33
++ nbtic_2016            1   414.88 422.88
++ shopper               1   415.16 423.16
++ DATEDEBADH_mois       1   415.99 423.99
++ h_mean_2016_QL        3   416.02 428.02
++ age_QL                4   414.27 428.27
++ MAGASIN              52   352.55 462.55
+
+Step:  AIC=418.64
+dev ~ flaneur + achat_unique + nb_mois_diff_2016
+
+                       Df Deviance    AIC
++ VIP                   1   402.25 412.25
++ prix_ticket_moy_2016  1   404.22 414.22
++ shopper               1   408.14 418.14
+<none>                      410.64 418.64
++ nbtic_2016            1   409.07 419.07
++ DATEDEBADH_mois       1   410.40 420.40
++ age_QL                4   408.37 424.37
++ h_mean_2016_QL        3   410.56 424.56
++ MAGASIN              52   345.10 457.10
+
+Step:  AIC=412.25
+dev ~ flaneur + achat_unique + nb_mois_diff_2016 + VIP
+
+                       Df Deviance    AIC
++ prix_ticket_moy_2016  1   387.90 399.90
+<none>                      402.25 412.25
++ shopper               1   400.50 412.50
++ nbtic_2016            1   400.84 412.84
++ DATEDEBADH_mois       1   402.00 414.00
++ age_QL                4   399.75 417.75
++ h_mean_2016_QL        3   401.76 417.76
++ MAGASIN              52   334.08 448.08
+
+Step:  AIC=399.9
+dev ~ flaneur + achat_unique + nb_mois_diff_2016 + VIP + prix_ticket_moy_2016
+
+                  Df Deviance    AIC
+<none>                 387.90 399.90
++ shopper          1   385.90 399.90
++ nbtic_2016       1   386.73 400.73
++ DATEDEBADH_mois  1   387.44 401.44
++ h_mean_2016_QL   3   387.44 405.44
++ age_QL           4   385.69 405.69
++ MAGASIN         52   321.45 437.45
