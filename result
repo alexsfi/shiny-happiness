@@ -1,0 +1,10 @@
+Step:  AIC=18975.09
+VIP ~ nb_mois_diff_2016 + prix_ticket_moy_2016 + dev + flaneur + 
+    nbtic_2016 + achat_unique + shopper + DATEDEBADH_mois
+
+                 Df Deviance   AIC
+<none>                 18922 18975
++ h_mean_2016_QL  3    18907 18977
++ new             1    18922 18980
++ age_QL          4    18905 18981
++ MAGASIN        66    18817 19256
